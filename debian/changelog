@@ -1,3 +1,9 @@
+whoopsie-daisy (0.1.33pexip1) pexip; urgency=low
+
+  * Prepare Pexip packaging
+
+ -- John-Mark Bell <jmb@pexip.com>  Wed, 25 Dec 2013 05:23:50 +0000
+
 whoopsie-daisy (0.1.33) precise-proposed; urgency=low
 
   * Continue to process the existing crash reports every two hours, not

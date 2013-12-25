@@ -1,7 +1,8 @@
 Source: whoopsie-daisy
 Section: utils
 Priority: optional
-Maintainer: Evan Dandrea <ev@ubuntu.com>
+Maintainer: Pexip AS <packaging@pexip.com>
+XSBC-Pexip-Original-Maintainer: Evan Dandrea <ev@ubuntu.com>
 Build-Depends: debhelper (>= 8.0.0),
  libglib2.0-dev (>= 2.31.6),
  libcurl4-openssl-dev,
@@ -15,6 +16,7 @@ Build-Depends: debhelper (>= 8.0.0),
 Standards-Version: 3.9.2
 Homepage: http://wiki.ubuntu.com/ErrorTracker
 Vcs-Bzr: http://code.launchpad.net/whoopsie-daisy
+XS-Pexip-Upstream: http://archive.ubuntu.com/ubuntu/ precise
 
 Package: whoopsie
 Architecture: any
