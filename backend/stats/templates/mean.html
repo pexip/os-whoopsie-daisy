@@ -1,0 +1,110 @@
+{% extends "index.html" %}
+{% block head %}
+<link href="/static/js/nvd3/src/d3.css" rel="stylesheet" type="text/css">
+<style>
+body {
+    overflow-y:scroll;
+}
+#mean {
+    height: 500px;
+    margin: 10px;
+    min-width: 100px;
+    min-height: 100px;
+}
+</style>
+<script src="/static/js/nvd3/lib/jquery.min.js"></script>
+<script src="/static/js/nvd3/nv.d3.min.js"></script>
+{% endblock %}
+{% block content %}
+<div id="mean"><svg></svg></div>
+<script type="text/javascript">
+nv.addGraph({
+    generate: function() {
+    var means = [{y: 60, x: new Date(2012,0,01)},
+                 {y: 75, x: new Date(2012,0,02)},
+                 {y: 20, x: new Date(2012,0,03)},
+                 {y: 3, x: new Date(2012,0,04)},
+                 {y: 100, x: new Date(2012,0,05)},
+                 {y: 62, x: new Date(2012,0,06)},
+                 {y: 120, x: new Date(2012,0,07)}];
+    var means2 = [{y: 30, x: new Date(2012,0,01)},
+                 {y: 15, x: new Date(2012,0,02)},
+                 {y: 1, x: new Date(2012,0,03)},
+                 {y: 1, x: new Date(2012,0,04)},
+                 {y: 80, x: new Date(2012,0,05)},
+                 {y: 45, x: new Date(2012,0,06)},
+                 {y: 100, x: new Date(2012,0,07)}];
+    var data = [
+        {
+            values: means,
+            key: "Actual",
+            color: "#ff7f0e"
+        },
+        {
+            values: means2,
+            key: "Ideal",
+            color: "#2ca02c"
+        },
+    ];
+    var chart = nv.models.lineWithLegend()
+    // FIXME don't use jquery
+    var width = $(window).width() - 40;
+    var height = $(window).height() - 40;
+
+    chart.width(width).height(height);
+    var formatter = d3.time.format('%Y-%m-%d');
+    chart.xAxis.scale(d3.time.scale());
+    // FIXME broken
+    chart.xAxis.ticks(d3.time.days, 3);
+    chart.xAxis.tickFormat(function(d) { return formatter(new Date(d))});
+    chart.yAxis.axisLabel('Mean time between failures').tickFormat(d3.format(',r'));
+    var container = d3.select('#mean svg')
+        .attr('width', width)
+        .attr('height', height)
+        .datum(data);
+
+    container.transition().duration(500).call(chart);
+    return chart;
+    },
+    callback: function (graph) {
+        graph.dispatch.on('tooltipShow', function(e) {
+            var offset = $('#mean').offset(),
+            left = e.pos[0] + offset.left,
+            top = e.pos[1] + offset.top,
+            formatterX = function(d) {
+                return d3.time.format('%x')(new Date(d))
+            };
+
+            var content = '<h3>' + e.series.key + '</h3>' +
+                          '<p>' + graph.y()(e.point) + ' seconds on ' +
+                          formatterX(graph.x()(e.point)) + '</p>';
+
+            nvtooltip.show([left, top], content);
+        });
+
+        graph.dispatch.on('tooltipHide', function(e) {
+            nvtooltip.cleanup();
+        });
+
+        $(window).resize(function() {
+            var width = $(window).width() - 40,
+                height = $(window).height() - 40,
+                margin = graph.margin();
+
+            if (width < margin.left + margin.right + 20)
+                width = margin.left + margin.right + 20;
+
+            if (height < margin.top + margin.bottom + 20)
+                height = margin.top + margin.bottom + 20;
+
+            graph.width(width).height(height);
+
+            d3.select('#mean svg')
+                .attr('width', width)
+                .attr('height', height)
+                .call(graph);
+        });
+    }
+});
+</script>
+{% endblock %}

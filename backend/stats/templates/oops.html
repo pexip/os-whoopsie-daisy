@@ -1,0 +1,8 @@
+{% extends "index.html" %}
+{% block content %}
+<table>
+{% for key, value in oops.items %}
+<tr><td>{{ key }}</td><td>{{ value|linebreaksbr }}</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

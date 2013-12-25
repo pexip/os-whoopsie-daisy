@@ -1,0 +1,12 @@
+ ProblemType: Crash
+Architecture: amd64
+Date: Thu Feb  2 17:09:31 2012
+ProcEnviron:
+ LANGUAGE=en_US:en
+ LC_CTYPE=en_US.UTF-8
+ LC_COLLATE=en_US.UTF-8
+ PATH=(custom, user)
+ LANG=en_US.UTF-8
+ LC_MESSAGES=en_US.UTF-8
+ SHELL=/bin/bash
+Uname: Linux 3.2.0-12-generic x86_64

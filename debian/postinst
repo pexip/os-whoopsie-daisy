@@ -1,0 +1,21 @@
+#! /bin/sh
+# postinst for whoopsie
+
+set -e
+
+if [ "$1" = configure ]; then
+		if ! getent passwd whoopsie >/dev/null; then
+			adduser --disabled-password --quiet --system \
+				--home /nonexistent --no-create-home --group whoopsie \
+				--shell /bin/false
+		fi
+		mkdir -p -m 3777 /var/crash
+		chmod g+s /var/crash
+		chgrp whoopsie /var/crash
+		chgrp whoopsie /var/crash/*.crash >/dev/null 2>&1 || true
+		chmod 0640 /var/crash/*.crash >/dev/null 2>&1 || true
+fi
+
+#DEBHELPER#
+
+exit 0

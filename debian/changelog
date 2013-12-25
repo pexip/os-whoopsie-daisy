@@ -1,0 +1,344 @@
+whoopsie-daisy (0.1.33) precise-proposed; urgency=low
+
+  * Continue to process the existing crash reports every two hours, not
+    just once after two hours (LP: #1205374).
+
+ -- Evan Dandrea <ev@ubuntu.com>  Mon, 29 Jul 2013 17:16:42 +0100
+
+whoopsie-daisy (0.1.32) precise; urgency=low
+
+  * Fix failing tests on powerpc and ARM.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Wed, 18 Apr 2012 13:04:36 +0100
+
+whoopsie-daisy (0.1.31) precise; urgency=low
+
+  * == is a bashism.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Thu, 12 Apr 2012 15:06:11 +0100
+
+whoopsie-daisy (0.1.30) precise; urgency=low
+
+  * Stop rejecting legal arguments to the postinst (LP: #978436). Thanks
+    Colin Watson!
+
+ -- Evan Dandrea <ev@ubuntu.com>  Thu, 12 Apr 2012 09:00:26 +0100
+
+whoopsie-daisy (0.1.29) precise; urgency=low
+
+  * Mark reports as complete when we get a HTTP response of 400 from the
+    server, as these represent the server not liking what we sent it.
+    Sending these again repeatedly would be pointless (LP: #979082). 
+
+ -- Evan Dandrea <ev@ubuntu.com>  Wed, 11 Apr 2012 17:36:32 +0100
+
+whoopsie-daisy (0.1.28) precise; urgency=low
+
+  * Create /var/crash if it doesn't already exist. Don't silence the
+    chmod and chgrp calls on it. Thanks Colin Watson (LP: #978502)!
+
+ -- Evan Dandrea <ev@ubuntu.com>  Wed, 11 Apr 2012 09:44:12 +0100
+
+whoopsie-daisy (0.1.27) precise; urgency=low
+
+  * Drop /etc/cron.daily/whoopsie. This is handled in apport now.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Tue, 10 Apr 2012 18:01:02 +0100
+
+whoopsie-daisy (0.1.26) precise; urgency=low
+
+  * Take ownership of the NetworkManager state variant on setup and
+    unref it, plugging a memory leak.
+  * Log the reason the server rejected the submitted crash report.
+  * Send the Whoopsie version with each crash submission.
+  * Delete both .upload and .uploaded files after 14 days. Thanks
+    Marc Deslauriers (LP: #973687).
+
+ -- Evan Dandrea <ev@ubuntu.com>  Tue, 10 Apr 2012 14:28:58 +0100
+
+whoopsie-daisy (0.1.25) precise; urgency=low
+
+  * Stop using a queue to monitor reports that need to be processed.
+    Just iterate over the reports that have a .upload file, but do not
+    have a matching .uploaded file.
+  * Set the GSettings backend to memory to avoid pulling in DConf when
+    we call into GNetworkMonitor.
+  * Split out the /var/crash monitoring code and add tests for it.
+  * Plug some memory leaks.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Thu, 29 Mar 2012 23:30:39 +0100
+
+whoopsie-daisy (0.1.24) precise; urgency=low
+
+  * Add the file listing of /var/crash to whoopsie bug reports. Taken
+    from apport's package hook.
+  * Fix cppcheck call in make check.
+  * Monitor network connectivity using NetworkManager and GNetworkMonitor.
+    Do not report being online and able to report crashes if the user only
+    has 3G or dial-up connectivity, or if there is no route.
+  * Do not upload crashes multiple times if the file attributes for
+    their .upload files change while on the report queue.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Thu, 29 Mar 2012 11:37:51 +0100
+
+whoopsie-daisy (0.1.23) precise; urgency=low
+
+  * Fix builds failing when cppcheck isn't present.
+  * Clean up closing file descriptors in mark_handled. Thanks Colin
+    Watson.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Fri, 23 Mar 2012 14:43:41 +0000
+
+whoopsie-daisy (0.1.22) precise; urgency=low
+
+  * Do not leak the file descriptor of our lockfile.
+  * Do not leak a file descriptor when marking a report as handled. Add
+    a test for the mark_report function.
+  * Fix potential NULL pointer dereference in report tests.
+  * If allocated with g_malloc, free with g_free.
+  * Add cppcheck to make check, but only when it's installed.
+  * Plug a memory corruption bug (hopefully). g_queue_find_custom
+    returns a *link* not a list, so do not try to hand it back to the
+    slice allocator as if it were a list.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Fri, 23 Mar 2012 14:17:43 +0000
+
+whoopsie-daisy (0.1.21) precise; urgency=low
+
+  [ Steve Langasek ]
+  * debian/rules: make sure dh_installinit knows about our upstart job, so
+    we get correct start/stop/restart handling on install/removal/upgrade.
+
+  [ Evan Dandrea ]
+  * Disable the network detection for now, to help in tracking the
+    source of a memory corruption bug.
+  * Clean up option parsing a bit.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Fri, 23 Mar 2012 11:44:51 +0000
+
+whoopsie-daisy (0.1.20) precise; urgency=low
+
+  * Handle errors in changing the filename extension, even when we're
+    pretty sure we have an extension.
+  * Handle errors in g_file_get_path.
+  * CURLOPT_WRITEFUNCTION may be called successively. Grow a string with
+    each call to account for this.
+  * Add an apport hook for attaching the stderr output when run under
+    upstart.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Thu, 22 Mar 2012 15:22:51 +0000
+
+whoopsie-daisy (0.1.19) precise; urgency=low
+
+  * Handle errors in parsing the crash database URL.
+  * Do not double-free the crash database core submission URL when a
+    system UUID is not present (LP: #960972).
+  * Handle errors in bson_append_string.
+  * Handle more BSON error conditions.
+  * Handle empty values in the apport format ("KeyName:\n")
+    (LP: #960766, LP: #960737, LP: #960751).
+
+ -- Evan Dandrea <ev@ubuntu.com>  Wed, 21 Mar 2012 17:39:20 +0000
+
+whoopsie-daisy (0.1.18) precise; urgency=low
+
+  * Use https for crash reporting.
+  * Ensure we generate core dumps when whoopsie crashes.
+  * Do not give whoopsie a shell.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Tue, 20 Mar 2012 21:24:51 +0000
+
+whoopsie-daisy (0.1.17) precise; urgency=low
+
+  * Ship a default configuration file.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Fri, 16 Mar 2012 14:36:57 +0000
+
+whoopsie-daisy (0.1.16) precise; urgency=low
+
+  * Fix the build of the previous release failing on account of make
+    check was failing in the backend code.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Mon, 12 Mar 2012 17:45:47 +0000
+
+whoopsie-daisy (0.1.15) precise; urgency=low
+
+  * Handle multiple crashes of the same binary by watching the
+    modification times on the .upload and .uploaded files.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Mon, 12 Mar 2012 17:06:26 +0000
+
+whoopsie-daisy (0.1.14) precise; urgency=low
+
+  * Do not include 'base64 ' on the front of any base64-encoded field.
+  * Check the return value of asprintf.
+  * CURLOPT_VERBOSE expects a long.
+  * CURLOPT_WRITEDATA expects a pointer.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Mon, 27 Feb 2012 17:50:52 +0000
+
+whoopsie-daisy (0.1.13) precise; urgency=low
+
+  * Support UTF-8 encoded text in crash reports.
+  * Only send a subset of the possible fields in a report, ignoring
+    fields created by package hooks.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Sun, 26 Feb 2012 15:44:01 +0000
+
+whoopsie-daisy (0.1.12) precise; urgency=low
+
+  * Add pyflakes to the build dependencies.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Thu, 23 Feb 2012 15:11:59 +0000
+
+whoopsie-daisy (0.1.11) precise; urgency=low
+
+  * Do not start the daemon if crash reporting is turned off.
+  * Output a better error message if the daemon is not started as root.
+  * Do not keep trying to process reports that cannot be parsed.
+  * Provide a long description for the whoopsie package.
+  * Drop the GNOME Control Center page for controlling crash reporting.
+    This has been moved into the activity-log-manager package and these
+    settings can be found under the 'Diagnostics' tab in Privacy.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Thu, 23 Feb 2012 15:01:18 +0000
+
+whoopsie-daisy (0.1.10) precise; urgency=low
+
+  * Add a cron job (run daily) to clean up the .upload and .uploaded
+    files.
+  * Remove the metrics preferences, since this does not exist.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Fri, 17 Feb 2012 19:11:08 +0000
+
+whoopsie-daisy (0.1.9) precise; urgency=low
+
+  * Change the queue processing timeout to every two hours.
+  * Change the GNOME Control Center page name to Diagnostics (LP: #934052).
+
+ -- Evan Dandrea <ev@ubuntu.com>  Fri, 17 Feb 2012 15:34:24 +0000
+
+whoopsie-daisy (0.1.8) precise; urgency=low
+
+  * Security fixes. Thanks Jamie Strandboge for the review.
+    - Check the return value of the open call in get_system_uuid.
+    - Properly initialize libcrypt.
+    - Check that the call to gcry_md_open succeeds
+    - Ensure that reading the SHA512 message digest succeeds.
+    - Protect against changes to the message digest length creating a
+      security vulnerability.
+    - Check the returncode of setenv.
+    - Use /var/lock/whoopsie instead of /tmp/.whoopsie-lock.
+    - umask is usually called before fork.
+    - Future-proof by using getrlimit instead of explicitly closing STD*
+    - Redirect stdin, stdout, and stderr to /dev/null.
+    - Ensure strings created in update_to_crash_file are NULL-terminated.
+    - Only process regular files in /var/crash.
+    - Replace calls to *alloc with g_*alloc, which calls abort() on
+      failure.
+    - Remove unused system_uuid pointer.
+    - Fix warnings in make check.
+    - Initialize all of curl.
+    - Redirect stderr to null in chgrp and chmod calls.
+    - Set home directory to /nonexistent.
+    - Enable libcrypt secure memory.
+    - Put the lock file in /var/lock/whoopsie/.
+    - Sanity check the CRASH_DB_URL environment variable.
+    - Added tests:
+      - Check handling of embedded NUL bytes.
+      - Verify that symlinks in /var/crash produce the correct error
+        message.
+      - Verify that keys without values in reports produce an error message.
+      - Ensure that the report does not start with a value.
+      - Correctly identify a report without spaces as malformed.
+      - Verify that directories in /var/crash produce the correct error
+        message.
+      - Ensure that blank lines in a report are treated as errors.
+      - Ensure that carriage returns are escaped.
+      - Do not start multi-line values with a newline.
+      - Check that a valid report has the exact expected contents.
+      - Ensure that other variants of embedded carriage returns are escaped.
+      - Verify that reports without a trailing newline are handled properly.
+  * Change crash database URL to http://daisy.ubuntu.com.
+  * Main inclusion request approved (LP: #913694).
+
+ -- Evan Dandrea <ev@ubuntu.com>  Thu, 16 Feb 2012 16:37:35 +0000
+
+whoopsie-daisy (0.1.7) precise; urgency=low
+
+  * Do not attempt to load the control center panel UI from the build
+    directory.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Fri, 10 Feb 2012 10:43:51 +0000
+
+whoopsie-daisy (0.1.6) precise; urgency=low
+
+  * Don't fail if there are no crash files (LP: #928735).
+
+ -- Evan Dandrea <ev@ubuntu.com>  Thu, 09 Feb 2012 13:18:08 +0000
+
+whoopsie-daisy (0.1.5) precise; urgency=low
+
+  * Add a control center privacy preferences page.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Mon, 06 Feb 2012 14:19:15 +0000
+
+whoopsie-daisy (0.1.4) precise; urgency=low
+
+  * Write the system UUID to the UserOOPS ColumnFamily.
+  * Drop the CAP_FOWNER stuff.  As James points out, we can just write a
+    .uploaded file and let cron clean up the mess.
+  * Have the client pass the architecture, rather that have an intermediary
+    processing step in the MQ.
+  * Add retracing support in process_core.py.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Thu, 26 Jan 2012 12:46:54 +0000
+
+whoopsie-daisy (0.1.3) precise; urgency=low
+
+  * Drop NetworkManager cflags and libs from Makefile.
+  * Add missing -lcap to tests Makefile.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Wed, 18 Jan 2012 17:58:17 +0000
+
+whoopsie-daisy (0.1.2) precise; urgency=low
+
+  * Added an upstart job.
+  * Don't segfault if we cannot open the report.
+  * Move to txstatsd for metrics submission.
+  * Moved to WSGI.
+  * Dropped Content-length, as it's superfluous.
+  * Use oops-repository for talking to Cassandra.
+  * Update the documentation.
+  * Don't run install target on make.
+  * Fix a double-free when a report is addded, then removed from the queue.
+  * Submit the core file when asked.
+  * Add initial MQ publishing for core file processing.
+  * Submit a SHA-512 hash of the system UUID to key against.
+  * Drop privileges when spawning.
+  * Don't crash if there are files without an extension in /var/crash.
+  * Fix a really nasty memory corruption bug.
+  * Make warnings build failures.
+  * Remove the lock file on exit.
+  * Add tests for get_system_uuid, get_crash_db_url, and hex_to_char.
+  * Move to GNetworkMonitor from NetworkManager for the network
+    connectivity check.
+  * Ensure in the postinst that whoopsie can read crash reports in
+    /var/crash.
+  * Isolate whoopsie into its own mount namespace, dropping all privileges and
+    capabilities but CAP_FOWNER, so that we can delete files in /var/crash even
+    though it's +t.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Wed, 18 Jan 2012 17:26:02 +0000
+
+whoopsie-daisy (0.1.1) precise; urgency=low
+
+  * Build dependencies.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Mon, 09 Jan 2012 08:29:06 +0000
+
+whoopsie-daisy (0.1) precise; urgency=low
+
+  * Initial Release.
+
+ -- Evan Dandrea <ev@ubuntu.com>  Thu, 01 Dec 2011 14:33:08 +0000

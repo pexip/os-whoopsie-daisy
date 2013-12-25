@@ -1,0 +1,13 @@
+{% extends "index.html" %}
+{% block content %}
+{{ bucket|safe }}
+<br />
+<pre>
+{{ stacktrace|safe }}
+</pre>
+<ul>
+{% for oopsid in oopses %}
+<li><a href="/oops/{{ oopsid }}">{{ oopsid }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,107 @@
+<html><head>
+<link rel="stylesheet" type="text/css" href="/static/js/yui/build/assets/skins/sam/skin.css">
+<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin">
+<style media="screen" type="text/css">
+<!--
+body { font-family: Ubuntu, sans-serif; }
+th,td { white-space: nowrap; }
+.chart {
+    font: 10px sans-serif;
+    background-color: steelblue;
+    text-align: left;
+    padding: 3px;
+    margin: 1px;
+    color: white;
+    float: right;
+}
+.yui3-datatable .yui3-datatable-col-signature {
+    padding: 0;
+    width: 400px;
+}
+.yui3-datatable .yui3-datatable-col-signature .yui3-datatable-liner {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 4px 10px;
+    width: 400px;
+}
+svg {
+  font: 9px Ubuntu;
+}
+-->
+</style>
+<script type="text/javascript" src="/static/js/d3/d3.v2.js?2.8.1"></script>
+<script type="text/javascript" src="/static/js/yui/build/yui-base/yui-base-min.js"></script>
+<script type="text/javascript">
+YUI().use('node', 'io-queue', 'datatable', 'datatable-sort', 'datasource', 'datatype', function(Y) {
+Y.on('load', function() {
+    var scale = d3.scale.log()
+        .range(["10", "50"]);
+
+    var chartFormatter = function(o) {
+        return "<div class=\"chart\" style=\"width: " + scale(o.value) + "px;\">" + o.value + "</div>";
+    }
+    var bugFormatter = function(o) {
+        return "<a href=\"http://pad.lv/" + o.value + "\">" + o.value + "</a>";
+    }
+    var cols = [
+        {key: "id", label: "Frequency", sortable:true, formatter:chartFormatter, allowHTML: true},
+        {key: "package", label: "Package", sortable:true},
+        {key: "seen", label: "First seen"},
+        {key: "signature", label: "Function", allowHTML: true,
+    cellTemplate: '<td class="{className}"><div class="yui3-datatable-liner">{content}</div></td>'},
+        {key: "examples", label: "Examples", allowHTML: true},
+        {key: "report", label: "Bug report", sortable:true, formatter:bugFormatter, allowHTML: true}];
+
+    var data = [
+        {% for row in rows %}
+        {
+            id: {{ row.count }},
+            package: "{{ row.package }}",
+            seen: "{{ row.seen }}",
+            signature: "{{ row.function }}",
+            examples: "{% for example in row.examples %}<a href=\"/oops/{{ example }}\">{{ forloop.counter }}</a>&nbsp;{% endfor %}",
+            report: "{{ row.report }}",
+        },
+        {% endfor %}
+    ];
+    var datasource = new Y.DataSource.Local({source:data});
+    var table = new Y.DataTable({
+        columnset: cols,
+    });
+    table.plug(Y.Plugin.DataTableDataSource, {
+        datasource: datasource
+    });
+    table.render("#problems");
+    table.sort({id:'desc'});
+    table.datasource.load();
+
+    function complete(id, o, args) {
+        lines = o.responseText.split("\n");
+        for (var key in lines) {
+            line = lines[key].split(" ");
+            if(line[1] == args.problem.signature) {
+                args.problem.report = line[0];
+                table.datasource.load();
+                break;
+            }
+        }
+    }
+
+    Y.io.queue.stop();
+    Y.on('io:complete', complete, Y);
+    for (var problem in data) {
+        var cfg = { arguments: {'problem' : data[problem]}};
+        var comps = data[problem].signature.split(":");
+        var binary = comps[0].replace(/\//g, "_");
+        Y.io.queue("/duplicates/" + binary + "_" + comps[1], cfg);
+    }
+    Y.io.queue.start();
+});
+});
+</script>
+</head>
+<body class="yui3-skin-sam">
+Most common problems in the past <select><option>2 days</option></select>
+<div id="problems"></div>
+</body>
+</html>
