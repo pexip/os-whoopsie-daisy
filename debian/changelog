@@ -1,3 +1,10 @@
+whoopsie-daisy (0.1.33pexip2) pexip; urgency=low
+
+  * Avoid integer overflow when encountering giant field values
+  * Fix up tests makefile
+
+ -- John-Mark Bell <jmb@pexip.com>  Fri, 28 Nov 2014 00:08:37 +0000
+
 whoopsie-daisy (0.1.33pexip1) pexip; urgency=low
 
   * Prepare Pexip packaging

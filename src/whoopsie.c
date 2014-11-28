@@ -19,6 +19,7 @@
 #define _XOPEN_SOURCE
 #define _GNU_SOURCE
 
+#include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -361,6 +362,12 @@ parse_report (const char* report_path, gboolean full_report, GError** error)
                 if (value) {
                     /* Space for the leading newline too. */
                     value_pos = value_p - value;
+                    if (INT_MAX - (1 + value_length + 1) < value_pos) {
+                        g_set_error (error,
+                                     g_quark_from_static_string ("whoopsie-quark"),
+                                     0, "Report value too long.");
+                        goto error;
+                    }
                     value = g_realloc (value, value_pos + 1 + value_length + 1);
                     value_p = value + value_pos;
                     *value_p = '\n';

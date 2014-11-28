@@ -1,7 +1,9 @@
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d' ' -f2)
+VERSION=$(shell dpkg-parsechangelog -l../../debian/changelog | grep ^Version: | cut -d' ' -f2)
 CFLAGS=$(shell pkg-config --cflags gio-2.0 glib-2.0 libcurl) \
+		$(shell libgcrypt-config --cflags) \
 		-g -I../../lib -I.. -DVERSION=\"$(VERSION)\" -DTEST -DTEST_DIR=\"$(CURDIR)\" -Wall
-LIBS=$(shell pkg-config --libs gio-2.0 glib-2.0 libcurl) -lcap
+LIBS=$(shell pkg-config --libs gio-2.0 glib-2.0 libcurl) -lcap \
+		$(shell libgcrypt-config --libs)
 
 test_parse_report_SOURCES=test_parse_report.c \
 							../whoopsie.c \
